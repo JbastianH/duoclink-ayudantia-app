@@ -1,4 +1,4 @@
-# Android Ayudantía 📱
+# DuocLink Ayudantía 📱
 
 Proyecto base Android desarrollado en **Kotlin** con **Jetpack Compose**.
 
