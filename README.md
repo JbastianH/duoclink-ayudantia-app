@@ -1,23 +1,44 @@
-# DuocLink Ayudantía 📱
+# Duoc Link Ayudantías
 
-Proyecto base Android desarrollado en **Kotlin** con **Jetpack Compose**.
+Aplicación móvil (Android, Jetpack Compose) para publicar y descubrir ayudantías entre estudiantes (tema, hora, lugar, duración, cupos).
 
-## Descripción
-Aplicación creada como parte del aprendizaje de desarrollo móvil en Android Studio.
-Incluye estructura básica con `MainActivity` y un contador de clicks como ejemplo.
+Stack
+- Kotlin, Jetpack Compose, Navigation, ViewModel
+- Gradle, GitHub Actions
 
-## Tecnologías
-- Kotlin
-- Android Studio
-- Jetpack Compose
-- Gradle (Kotlin DSL)
+Paleta institucional
+- Duoc Yellow: #FAB21B
+- Duoc Blue: #00213E
+- Duoc White: #FFFFFF
+- Duoc Gray: #CFD4D8
 
-## Requisitos
-- Android Studio Giraffe o superior
-- SDK mínimo: 30 (Android 11)
-- JDK 17 o superior
+MVP (alcance inicial)
+- Autenticación simple (login “dummy” y navegación a Home)
+- Listado de ayudantías (mock/local)
+- Crear ayudantía (formulario con validación mínima)
 
-## ▶️ Ejecución
-1. Clonar este repositorio:
-   ```bash
-   git clone https://github.com/joelarancibia/android-ayudantia.git
+Cómo ejecutar
+1) Abrir el proyecto en Android Studio (Giraffe+), JDK 17.
+2) Ejecutar en emulador o dispositivo físico.
+
+Ramas y releases
+- main: estable y liberable (tags semánticos vX.Y.Z)
+- dev: integración continua del sprint/iteración
+- feature/*, task/*, fix/*: trabajo por Issue
+- Flujo: feature → PR a dev → pruebas → merge → release: dev → main + tag
+
+Tablero
+- Project Board con columnas: To do / In progress / In review / Done
+- Todos los Issues deben estar en el board
+
+Definition of Done (DoD)
+- Compila (CI verde)
+- UI consistente con la paleta
+- Validaciones básicas y manejo de errores visible
+- PR con checklist completo y descripción clara
+- Pruebas manuales mínimas documentadas en el PR
+
+Roadmap corto
+- v0.1.0: Login + Home + lista mock
+- v0.2.0: Crear ayudantía + validación
+- v0.3.0: Persistencia local (Room) y filtros básicos
