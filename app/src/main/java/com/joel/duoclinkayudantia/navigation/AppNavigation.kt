@@ -73,6 +73,8 @@ fun AppNavigation() {
             composable(AppRoute.Home.path) { HomeScreen(navController) }
             composable(AppRoute.Ayudantias.path) { AyudantiasScreen() }
             composable(AppRoute.Perfil.path) { PerfilScreen() }
+        composable(route = AppRoute.Home.path) {
+            HomeScreen(navController)
         }
     }
 }
