@@ -44,12 +44,11 @@ fun AppNavigation() {
                             onClick = {
                                 // Al presionar un ítem, se navega hacia su ruta correspondiente.
                                 navController.navigate(item.route) {
-                                    // Se asegura de que la navegación mantenga el estado y no duplique destinos.
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                                    // Limpia el back stack hasta Home antes de navegar
+                                    popUpTo(AppRoute.Home.path) {
+                                        inclusive = false
                                     }
                                     launchSingleTop = true
-                                    restoreState = true
                                 }
                             },
                             // Se define el ícono y la descripción accesible del elemento.
