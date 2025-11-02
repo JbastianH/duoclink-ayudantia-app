@@ -18,7 +18,7 @@ fun AppNavHost(navController: NavHostController) {
             LoginScreen(navController)
         }
         composable(route = AppRoute.Home.path) {
-            HomeScreen()
+            HomeScreen(navController)
         }
     }
 }
