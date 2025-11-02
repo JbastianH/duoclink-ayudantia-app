@@ -98,7 +98,12 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { navController.navigate(AppRoute.Home.path) },
+            onClick = {
+                navController.navigate(AppRoute.Home.path) {
+                    // Se elimina la pantalla de Login del back stack para evitar volver atrás a ella.
+                    popUpTo(AppRoute.Login.path) { inclusive = true }
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             interactionSource = interactionSource,
             colors = ButtonDefaults.buttonColors(
@@ -106,7 +111,7 @@ fun LoginScreen(navController: NavController) {
                 contentColor = animatedContent
             )
         ) {
-            Text("Login")
+            Text("Iniciar sesión")
         }
     }
 }
