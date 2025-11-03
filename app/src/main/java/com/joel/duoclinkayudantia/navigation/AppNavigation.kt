@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.joel.duoclinkayudantia.ui.screens.*
 
@@ -70,8 +69,8 @@ fun AppNavigation() {
             // Cada composable representa una pantalla dentro del grafo de navegación.
             composable(AppRoute.Login.path) { LoginScreen(navController) }
             composable(AppRoute.Home.path) { HomeScreen(navController) }
-            composable(AppRoute.Ayudantias.path) { AyudantiasScreen() }
-            composable(AppRoute.Perfil.path) { PerfilScreen() }
+            composable(AppRoute.Ayudantias.path) { AyudantiasScreen(navController) }
+            composable(AppRoute.Perfil.path) { PerfilScreen(navController) }
         }
     }
 }

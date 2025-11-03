@@ -51,4 +51,10 @@ class PerfilViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
     }
+
+    fun clearProfile() {
+        setNombre("")
+        setApellido("")
+        setFotoUri(null)
+    }
 }

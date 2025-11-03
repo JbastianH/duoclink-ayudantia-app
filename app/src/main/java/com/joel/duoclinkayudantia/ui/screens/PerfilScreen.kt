@@ -29,7 +29,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.joel.duoclinkayudantia.navigation.AppRoute
 import com.joel.duoclinkayudantia.ui.PerfilViewModel
 import com.joel.duoclinkayudantia.ui.theme.DuocBlue
 import com.joel.duoclinkayudantia.ui.theme.DuocYellow
@@ -37,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(vm: PerfilViewModel = viewModel()) {
+fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()) {
     val nombre by vm.nombre.collectAsStateWithLifecycle()
     val apellido by vm.apellido.collectAsStateWithLifecycle()
     val fotoUri by vm.fotoUri.collectAsStateWithLifecycle()
@@ -233,6 +235,48 @@ fun PerfilScreen(vm: PerfilViewModel = viewModel()) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = buttonColors(containerColor = DuocYellow)
             ) { Text("Guardar cambios") }
+
+            var showConfirm by remember { mutableStateOf(false)}
+
+            Spacer(Modifier.height(12.dp))
+
+            // Botón principal de cerrar sesión
+            Button(
+                onClick = { showConfirm = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
+            ) {
+                Text("Cerrar sesión")
+            }
+
+            // Diálogo de confirmación
+            if (showConfirm) {
+                AlertDialog(
+                    onDismissRequest = { showConfirm = false },
+                    title = { Text("Cerrar sesión") },
+                    text = { Text("¿Estás seguro de que quieres cerrar sesión?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            vm.clearProfile() // Limpia los datos locales
+                            showConfirm = false
+                            navController.navigate(AppRoute.Login.path) {
+                                popUpTo(AppRoute.Home.path) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }) {
+                            Text("Sí, salir")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showConfirm = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                )
+            }
         }
     }
 }
