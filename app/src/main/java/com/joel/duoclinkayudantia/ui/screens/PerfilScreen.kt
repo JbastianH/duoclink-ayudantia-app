@@ -32,8 +32,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.joel.duoclinkayudantia.navigation.AppRoute
-import com.joel.duoclinkayudantia.ui.PerfilViewModel
+import com.joel.duoclinkayudantia.viewmodel.PerfilViewModel
 import com.joel.duoclinkayudantia.ui.theme.DuocBlue
+import com.joel.duoclinkayudantia.ui.theme.DuocWhite
 import com.joel.duoclinkayudantia.ui.theme.DuocYellow
 import kotlinx.coroutines.launch
 
@@ -51,21 +52,16 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    /* ---------- Launchers ---------- */
-
-    // Cámara: guarda la foto en MediaStore y devuelve éxito/fracaso
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
         if (success && cameraUri != null) {
             capturedBitmap = null
-            vm.setFotoUri(cameraUri)  // persistente
+            vm.setFotoUri(cameraUri)
         } else {
-            // si se canceló o falló: elimina el registro vacío
             cameraUri?.let { context.contentResolver.delete(it, null, null) }
             cameraUri = null
         }
     }
 
-    // Galería
     val pickFromGallery = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -75,7 +71,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
         }
     }
 
-    /* ---------- Permisos ---------- */
     val permissionsToRequest = remember {
         buildList {
             add(Manifest.permission.CAMERA)
@@ -87,9 +82,8 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
     }
     val requestPermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { /* no-op */ }
+    ) { }
 
-    /* ---------- Helpers ---------- */
     fun createImageUri(context: android.content.Context): Uri? {
         val values = ContentValues().apply {
             put(
@@ -97,7 +91,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                 "perfil_${System.currentTimeMillis()}.jpg"
             )
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            // API 29+ (scoped storage)
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/DuocLinkAyudantia")
         }
         return context.contentResolver.insert(
@@ -117,7 +110,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
         pickFromGallery.launch("image/*")
     }
 
-    /* ---------- UI ---------- */
     val scroll = rememberScrollState()
     Scaffold(
         topBar = {
@@ -125,7 +117,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                 title = { Text("Perfil") },
                 colors = centerAlignedTopAppBarColors(
                     containerColor = DuocBlue,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    titleContentColor = DuocWhite
                 )
             )
         },
@@ -140,7 +132,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Nombre + Apellido arriba del avatar
             val displayName = listOf(nombre, apellido)
                 .filter { it.isNotBlank() }
                 .joinToString(" ")
@@ -149,7 +140,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
             Text(text = displayName, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(12.dp))
 
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -240,7 +230,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
 
             Spacer(Modifier.height(12.dp))
 
-            // Botón principal de cerrar sesión
             Button(
                 onClick = { showConfirm = true },
                 modifier = Modifier.fillMaxWidth(),
@@ -252,7 +241,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                 Text("Cerrar sesión")
             }
 
-            // Diálogo de confirmación
             if (showConfirm) {
                 AlertDialog(
                     onDismissRequest = { showConfirm = false },
@@ -260,7 +248,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                     text = { Text("¿Estás seguro de que quieres cerrar sesión?") },
                     confirmButton = {
                         TextButton(onClick = {
-                            vm.clearProfile() // Limpia los datos locales
+                            vm.clearProfile()
                             showConfirm = false
                             navController.navigate(AppRoute.Login.path) {
                                 popUpTo(AppRoute.Home.path) { inclusive = true }

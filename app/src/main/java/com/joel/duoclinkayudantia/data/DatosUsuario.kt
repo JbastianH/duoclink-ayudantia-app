@@ -26,7 +26,11 @@ object UserPrefs {
         context.dataStore.edit { prefs ->
             prefs[KEY_NOMBRE] = nombre
             prefs[KEY_APELLIDO] = apellido
-            if (fotoUri != null) prefs[KEY_FOTO_URI] = fotoUri else prefs.remove(KEY_FOTO_URI)
+            if (fotoUri != null) {
+                prefs[KEY_FOTO_URI] = fotoUri
+            } else {
+                prefs.remove(KEY_FOTO_URI)
+            }
         }
     }
 }

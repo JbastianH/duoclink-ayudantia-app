@@ -24,25 +24,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    // Estados de los campos.
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Interacciones para animar el botón.
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Colores animados del botón.
     val targetContainer = if (isPressed) DuocYellow else DuocBlue
     val targetContent = if (isPressed) DuocBlue else DuocWhite
     val animatedContainer by animateColorAsState(targetContainer)
     val animatedContent by animateColorAsState(targetContent)
 
-    // Snackbar para mensajes de validación.
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Scaffold para alojar snackbar y contenido.
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { inner ->
@@ -55,7 +50,6 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo institucional.
             Image(
                 painter = painterResource(id = R.drawable.dllogo),
                 contentDescription = "DuocLink Logo",
@@ -67,7 +61,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(2.dp))
 
-            // Campo Usuario.
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -87,7 +80,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Campo Contraseña.
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -108,7 +100,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(32.dp))
 
-            // Botón de inicio de sesión con validación y navegación segura.
             Button(
                 onClick = {
                     when {
@@ -122,11 +113,9 @@ fun LoginScreen(navController: NavController) {
                             scope.launch { snackbarHostState.showSnackbar("Debe ingresar la contraseña") }
                         }
                         else -> {
-                            // Validación simple (mock): credenciales fijas.
                             val ok = (username == "admin" && password == "1234")
                             if (ok) {
                                 navController.navigate(AppRoute.Home.path) {
-                                    // Elimina Login del back stack para no volver con Atrás.
                                     popUpTo(AppRoute.Login.path) { inclusive = true }
                                 }
                             } else {
