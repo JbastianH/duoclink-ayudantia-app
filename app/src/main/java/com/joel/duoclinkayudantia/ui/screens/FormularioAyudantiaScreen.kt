@@ -94,7 +94,6 @@ fun FormularioAyudantiaScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ... El resto del formulario es idéntico al de CrearAyudantiaScreen ...
             OutlinedTextField(
                 value = formState.publicadoPor,
                 onValueChange = { },

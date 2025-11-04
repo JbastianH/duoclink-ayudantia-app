@@ -77,23 +77,29 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
         startDestination = AppRoute.Ayudantias.path,
         route = AppRoute.AyudantiasGraph.path
     ) {
-        composable(AppRoute.Ayudantias.path) {
-            val backStackEntry = navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+        composable(AppRoute.Ayudantias.path) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+            }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
             AyudantiasScreen(navController, viewModel)
         }
-        composable(AppRoute.CrearAyudantia.path) {
-            val backStackEntry = navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+        composable(AppRoute.CrearAyudantia.path) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+            }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
             FormularioAyudantiaScreen(navController, viewModel)
         }
         composable(
             route = AppRoute.EditarAyudantia.path,
             arguments = listOf(navArgument("ayudantiaId") { type = NavType.IntType })
-        ) {
-            val backStackEntry = navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+        ) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
+            }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
-            val ayudantiaId = it.arguments?.getInt("ayudantiaId")
+            val ayudantiaId = navBackStackEntry.arguments?.getInt("ayudantiaId")
             FormularioAyudantiaScreen(navController, viewModel, ayudantiaId)
         }
     }
