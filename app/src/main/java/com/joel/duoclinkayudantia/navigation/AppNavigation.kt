@@ -25,6 +25,7 @@ import com.joel.duoclinkayudantia.ui.screens.HomeScreen
 import com.joel.duoclinkayudantia.ui.screens.LoginScreen
 import com.joel.duoclinkayudantia.ui.screens.PerfilScreen
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
+import androidx.compose.runtime.remember
 
 @Composable
 fun AppNavigation() {
