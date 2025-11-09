@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
-import com.joel.duoclinkayudantia.navigation.AppNavHost
+import com.joel.duoclinkayudantia.navigation.AppNavigation
 import com.joel.duoclinkayudantia.ui.theme.DuocLinkAyudantiaTheme
 
 class MainActivity : ComponentActivity() {
@@ -14,8 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DuocLinkAyudantiaTheme {
-                val navController = rememberNavController()
-                AppNavHost(navController = navController)
+                AppNavigation()
             }
         }
     }
