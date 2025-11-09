@@ -5,9 +5,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,16 +21,18 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.joel.duoclinkayudantia.ui.screens.AyudantiasScreen
 import com.joel.duoclinkayudantia.ui.screens.FormularioAyudantiaScreen
 import com.joel.duoclinkayudantia.ui.screens.HomeScreen
 import com.joel.duoclinkayudantia.ui.screens.LoginScreen
 import com.joel.duoclinkayudantia.ui.screens.PerfilScreen
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
-import androidx.compose.runtime.remember
 
 @Composable
 fun AppNavigation() {
@@ -44,8 +51,10 @@ fun AppNavigation() {
                         NavigationBarItem(
                             selected = currentDestination.isOn(item.route),
                             onClick = {
+                                if (currentDestination.isOn(item.route)) return@NavigationBarItem
+
                                 navController.navigate(item.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
+                                    popUpTo(AppRoute.Home.path) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
