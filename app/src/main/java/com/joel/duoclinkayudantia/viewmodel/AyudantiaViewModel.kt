@@ -3,24 +3,18 @@ package com.joel.duoclinkayudantia.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.joel.duoclinkayudantia.data.AppDatabase
+import com.joel.duoclinkayudantia.data.repository.AyudantiaRepository
 import com.joel.duoclinkayudantia.data.UserPrefs
+import com.joel.duoclinkayudantia.model.Ayudantia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-data class Ayudantia(
-    val id: Int = 0,
-    val publicadoPor: String,
-    val tema: String,
-    val lugar: String,
-    val hora: String,
-    val dia: String,
-    val cupos: Int,
-    val duracion: Int
-)
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.delay
 
 data class CrearAyudantiaUiState(
     val id: Int? = null,
@@ -46,6 +40,8 @@ data class CrearAyudantiaUiState(
 
 class AyudantiaViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val repo = AyudantiaRepository(AppDatabase.get(application).ayudantiaDao())
+
     private val _ayudantias = MutableStateFlow<List<Ayudantia>>(emptyList())
     val ayudantias: StateFlow<List<Ayudantia>> = _ayudantias.asStateFlow()
 
@@ -54,12 +50,9 @@ class AyudantiaViewModel(application: Application) : AndroidViewModel(applicatio
 
     init {
         viewModelScope.launch {
-            _ayudantias.value = listOf(
-                Ayudantia(1, "Juan Perez", "Cálculo I", "Sala 301", "14:00", "Lunes", 10, 90),
-                Ayudantia(2, "Ana Gomez", "Programación Avanzada", "Lab 5", "16:00", "Miércoles", 5, 120)
-            )
-            resetFormState()
+            repo.ayudantias.collectLatest { _ayudantias.value = it }
         }
+        resetFormState()
     }
 
     fun onFormValueChange(
@@ -88,67 +81,61 @@ class AyudantiaViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun guardarAyudantia() {
+        // Evita múltiples publicaciones simultáneas
+        if (_formState.value.isLoading) return
         _formState.update {
             val hora = it.horaInput.padStart(2, '0')
             val minuto = it.minutoInput.padStart(2, '0')
             it.copy(hora = "$hora:$minuto")
         }
-
         if (!validarFormulario()) return
-
-        val currentState = _formState.value
-        if (currentState.id == null) {
-            val nuevaAyudantia = Ayudantia(
-                id = (_ayudantias.value.maxOfOrNull { it.id } ?: 0) + 1,
-                publicadoPor = currentState.publicadoPor,
-                tema = currentState.tema,
-                lugar = currentState.lugar,
-                hora = currentState.hora,
-                dia = currentState.dia,
-                cupos = currentState.cupos.toInt(),
-                duracion = currentState.duracion.toInt()
-            )
-            _ayudantias.update { it + nuevaAyudantia }
-        } else {
-            val ayudantiaActualizada = Ayudantia(
-                id = currentState.id,
-                publicadoPor = currentState.publicadoPor,
-                tema = currentState.tema,
-                lugar = currentState.lugar,
-                hora = currentState.hora,
-                dia = currentState.dia,
-                cupos = currentState.cupos.toInt(),
-                duracion = currentState.duracion.toInt()
-            )
-            _ayudantias.update { list ->
-                list.map { if (it.id == currentState.id) ayudantiaActualizada else it }
+        val state = _formState.value
+        viewModelScope.launch {
+            _formState.update { it.copy(isLoading = true, success = false, error = null) }
+            try {
+                val entidad = Ayudantia(
+                    id = state.id ?: 0,
+                    publicadoPor = state.publicadoPor,
+                    tema = state.tema,
+                    lugar = state.lugar,
+                    hora = state.hora,
+                    dia = state.dia,
+                    cupos = state.cupos.toInt(),
+                    duracion = state.duracion.toInt()
+                )
+                repo.upsert(entidad)
+                delay(2000)
+                _formState.update { it.copy(isLoading = false, success = true) }
+            } catch (e: Exception) {
+                _formState.update { it.copy(isLoading = false, error = e.message ?: "Error al guardar") }
             }
         }
-        _formState.update { it.copy(success = true) }
+    }
+
+    fun dismissSuccess() {
+        _formState.update { it.copy(success = false) }
     }
 
     fun eliminarAyudantia(ayudantia: Ayudantia) {
-        _ayudantias.update { currentList ->
-            currentList.filterNot { it.id == ayudantia.id }
-        }
+        viewModelScope.launch { repo.delete(ayudantia) }
     }
 
     fun cargarAyudantiaParaEditar(id: Int) {
-        val ayudantia = _ayudantias.value.find { it.id == id }
-        if (ayudantia != null) {
-            val horaSplit = ayudantia.hora.split(":")
+        viewModelScope.launch {
+            val a = repo.get(id) ?: return@launch
+            val split = a.hora.split(":")
             _formState.update {
                 it.copy(
-                    id = ayudantia.id,
-                    publicadoPor = ayudantia.publicadoPor,
-                    tema = ayudantia.tema,
-                    lugar = ayudantia.lugar,
-                    hora = ayudantia.hora,
-                    horaInput = horaSplit.getOrElse(0) { "" },
-                    minutoInput = horaSplit.getOrElse(1) { "" },
-                    dia = ayudantia.dia,
-                    cupos = ayudantia.cupos.toString(),
-                    duracion = ayudantia.duracion.toString()
+                    id = a.id,
+                    publicadoPor = a.publicadoPor,
+                    tema = a.tema,
+                    lugar = a.lugar,
+                    hora = a.hora,
+                    horaInput = split.getOrElse(0) { "" },
+                    minutoInput = split.getOrElse(1) { "" },
+                    dia = a.dia,
+                    cupos = a.cupos.toString(),
+                    duracion = a.duracion.toString()
                 )
             }
         }
@@ -167,16 +154,13 @@ class AyudantiaViewModel(application: Application) : AndroidViewModel(applicatio
         val state = _formState.value
         val temaError = if (state.tema.isBlank()) "El tema es requerido" else null
         val lugarError = if (state.lugar.isBlank()) "El lugar es requerido" else null
-        
         val horaError = when {
             state.horaInput.isBlank() || state.minutoInput.isBlank() -> "La hora es requerida"
             state.horaInput.toIntOrNull() == null || state.minutoInput.toIntOrNull() == null -> "Formato inválido"
             state.horaInput.toInt() !in 0..23 || state.minutoInput.toInt() !in 0..59 -> "Hora o minutos fuera de rango"
             else -> null
         }
-
         val diaError = if (state.dia.isBlank()) "El día es requerido" else null
-        
         val duracionError = if (state.duracion.isBlank()) "La duración es requerida" else null
         val cuposError = when {
             state.cupos.isBlank() -> "Los cupos son requeridos"
@@ -185,7 +169,6 @@ class AyudantiaViewModel(application: Application) : AndroidViewModel(applicatio
             state.cupos.toInt() > 45 -> "El cupo máximo es 45"
             else -> null
         }
-
         _formState.update {
             it.copy(
                 temaError = temaError,
@@ -196,7 +179,6 @@ class AyudantiaViewModel(application: Application) : AndroidViewModel(applicatio
                 duracionError = duracionError
             )
         }
-
         return listOfNotNull(temaError, lugarError, horaError, diaError, cuposError, duracionError).isEmpty()
     }
 }
