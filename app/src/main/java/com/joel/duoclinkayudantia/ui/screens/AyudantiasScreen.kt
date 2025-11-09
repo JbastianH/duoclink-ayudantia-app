@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.joel.duoclinkayudantia.navigation.AppRoute
-import com.joel.duoclinkayudantia.viewmodel.Ayudantia
+import com.joel.duoclinkayudantia.model.Ayudantia
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +36,7 @@ fun AyudantiasScreen(
                 Button(
                     onClick = {
                         vm.eliminarAyudantia(ayudantiaParaEliminar!!)
+                        ayudantiaParaEliminar = null
                         showDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
@@ -68,11 +69,10 @@ fun AyudantiasScreen(
                 Text(
                     "Ayudantías Disponibles",
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.weight(1f) // Ocupa el espacio disponible
+                    modifier = Modifier.weight(1f)
                 )
                 Button(
                     onClick = { navController.navigate(AppRoute.CrearAyudantia.path) },
-                    // El botón se alinea correctamente con el texto
                 ) {
                     Text("Publicar Ayudantía")
                 }
