@@ -1,6 +1,6 @@
-package com.joel.duoclinkayudantia.data.repository
+package com.joel.duoclinkayudantia.repository
 
-import com.joel.duoclinkayudantia.data.AyudantiaDao
+import com.joel.duoclinkayudantia.model.data.AyudantiaDao
 import com.joel.duoclinkayudantia.model.Ayudantia
 import kotlinx.coroutines.flow.Flow
 

@@ -1,4 +1,4 @@
-package com.joel.duoclinkayudantia.data
+package com.joel.duoclinkayudantia.model.data
 
 import androidx.room.*
 import com.joel.duoclinkayudantia.model.Ayudantia

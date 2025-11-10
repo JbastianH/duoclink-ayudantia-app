@@ -1,4 +1,4 @@
-package com.joel.duoclinkayudantia.data
+package com.joel.duoclinkayudantia.model.data
 
 import android.content.Context
 import androidx.room.Database
