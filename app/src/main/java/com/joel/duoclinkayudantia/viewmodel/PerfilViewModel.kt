@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.joel.duoclinkayudantia.model.data.UserPrefs
+import com.joel.duoclinkayudantia.data.UserPrefs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ class PerfilViewModel(app: Application) : AndroidViewModel(app) {
     val fotoUri = _fotoUri.asStateFlow()
 
     init {
-        // Carga inicial desde DataStore
+
         val ctx = getApplication<Application>().applicationContext
         viewModelScope.launch {
             UserPrefs.nombreFlow(ctx).collect { _nombre.value = it }

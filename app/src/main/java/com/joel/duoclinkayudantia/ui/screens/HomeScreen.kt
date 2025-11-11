@@ -38,7 +38,7 @@ fun HomeScreen(nav: NavController) {
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Logo institucional
+                
                 Image(
                     painter = painterResource(id = R.drawable.dllogo),
                     contentDescription = "DuocLink Logo",
@@ -50,7 +50,7 @@ fun HomeScreen(nav: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // Título principal
+              
                 Text(
                     text = "Ayudantías",
                     style = MaterialTheme.typography.headlineMedium,
@@ -60,7 +60,7 @@ fun HomeScreen(nav: NavController) {
 
                 Spacer(Modifier.height(8.dp))
 
-                // Descripción
+            
                 Text(
                     text = "Encuentra y gestiona tus ayudantías en un solo lugar.",
                     style = MaterialTheme.typography.bodyMedium,
