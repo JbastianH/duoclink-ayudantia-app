@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.joel.duoclinkayudantia.data.AppDatabase
-import com.joel.duoclinkayudantia.data.repository.AyudantiaRepository
+import com.joel.duoclinkayudantia.repository.AyudantiaRepository
 import com.joel.duoclinkayudantia.data.UserPrefs
 import com.joel.duoclinkayudantia.model.Ayudantia
 import kotlinx.coroutines.flow.MutableStateFlow

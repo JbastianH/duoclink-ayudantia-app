@@ -45,8 +45,6 @@ fun FormularioAyudantiaScreen(
             vm.resetFormState()
         }
     }
-
-    // Espera 1s mostrando el check y luego navega atrás
     LaunchedEffect(formState.success) {
         if (formState.success) {
             delay(1000)
@@ -247,8 +245,6 @@ fun FormularioAyudantiaScreen(
                     }
                 }
             }
-
-            // Overlay de éxito por 1 segundo
             if (!formState.isLoading && formState.success) {
                 Box(
                     modifier = Modifier

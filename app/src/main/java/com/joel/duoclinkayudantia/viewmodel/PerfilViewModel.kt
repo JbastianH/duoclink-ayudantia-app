@@ -21,7 +21,7 @@ class PerfilViewModel(app: Application) : AndroidViewModel(app) {
     val fotoUri = _fotoUri.asStateFlow()
 
     init {
-        // Carga inicial desde DataStore
+
         val ctx = getApplication<Application>().applicationContext
         viewModelScope.launch {
             UserPrefs.nombreFlow(ctx).collect { _nombre.value = it }
