@@ -68,7 +68,7 @@ fun AyudantiasScreen(
             ) {
                 Text(
                     "Ayudantías Disponibles",
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.weight(1f)
                 )
                 Button(

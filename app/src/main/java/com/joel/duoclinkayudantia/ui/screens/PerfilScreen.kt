@@ -47,8 +47,6 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
 
     var capturedBitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
-    var cameraPermissionGranted by remember { mutableStateOf(false) }
-    var readImagesPermissionGranted by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -73,19 +71,18 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
         }
     }
 
+    val permissionsToRequest = remember {
+        buildList {
+            add(Manifest.permission.CAMERA)
+            if (Build.VERSION.SDK_INT >= 33)
+                add(Manifest.permission.READ_MEDIA_IMAGES)
+            else
+                add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }.toTypedArray()
+    }
     val requestPermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        cameraPermissionGranted = result[Manifest.permission.CAMERA] == true
-
-        val readKey =
-            if (Build.VERSION.SDK_INT >= 33)
-                Manifest.permission.READ_MEDIA_IMAGES
-            else
-                Manifest.permission.READ_EXTERNAL_STORAGE
-
-        readImagesPermissionGranted = result[readKey] == true
-    }
+    ) { }
 
     fun createImageUri(context: android.content.Context): Uri? {
         val values = ContentValues().apply {
@@ -103,26 +100,14 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
     }
 
     fun onTakePhoto() {
-        if (!cameraPermissionGranted) {
-            requestPermissions.launch(arrayOf(Manifest.permission.CAMERA))
-        } else {
-            cameraUri = createImageUri(context)
-            cameraUri?.let { takePicture.launch(it) }
-        }
+        requestPermissions.launch(permissionsToRequest)
+        cameraUri = createImageUri(context)
+        cameraUri?.let { takePicture.launch(it) }
     }
 
     fun onPickFromGallery() {
-        val readPermission =
-            if (Build.VERSION.SDK_INT >= 33)
-                Manifest.permission.READ_MEDIA_IMAGES
-            else
-                Manifest.permission.READ_EXTERNAL_STORAGE
-
-        if (!readImagesPermissionGranted) {
-            requestPermissions.launch(arrayOf(readPermission))
-        } else {
-            pickFromGallery.launch("image/*")
-        }
+        requestPermissions.launch(permissionsToRequest)
+        pickFromGallery.launch("image/*")
     }
 
     val scroll = rememberScrollState()
@@ -144,6 +129,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(scroll),
+
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val displayName = listOf(nombre, apellido)
@@ -240,7 +226,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                 colors = buttonColors(containerColor = DuocYellow)
             ) { Text("Guardar cambios") }
 
-            var showConfirm by remember { mutableStateOf(false) }
+            var showConfirm by remember { mutableStateOf(false)}
 
             Spacer(Modifier.height(12.dp))
 
