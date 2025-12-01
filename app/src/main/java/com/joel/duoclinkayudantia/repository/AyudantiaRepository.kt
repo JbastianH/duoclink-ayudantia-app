@@ -4,7 +4,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.joel.duoclinkayudantia.model.Autor
-import com.joel.duoclinkayudantia.data.AyudantiaDao
 import com.joel.duoclinkayudantia.model.Ayudantia
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +27,24 @@ class AyudantiaRepository {
                 }
                 val items = snapshot?.documents?.mapNotNull { doc ->
                     try {
-                        doc.toObject(Ayudantia::class.java)?.copy(id = doc.id)
+                        // Mapeo manual para evitar errores de tipo o nulos
+                        val data = doc.data ?: return@mapNotNull null
+                        val autorMap = data["autor"] as? Map<String, Any> ?: emptyMap()
+                        
+                        Ayudantia(
+                            id = doc.id,
+                            materia = data["materia"] as? String ?: "",
+                            cupo = (data["cupo"] as? Long)?.toInt() ?: 0,
+                            inscritos = (data["inscritos"] as? Long)?.toInt() ?: 0,
+                            horario = data["horario"] as? String ?: "",
+                            dia = data["dia"] as? String ?: "",
+                            lugar = data["lugar"] as? String ?: "",
+                            autor = Autor(
+                                uid = autorMap["uid"] as? String ?: "",
+                                nombre = autorMap["nombre"] as? String ?: ""
+                            ),
+                            creado = data["creado"] as? com.google.firebase.Timestamp
+                        )
                     } catch (e: Exception) {
                         android.util.Log.e("AyudantiaRepository", "Error al convertir documento: ${doc.id}", e)
                         null

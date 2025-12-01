@@ -3,9 +3,6 @@ package com.joel.duoclinkayudantia.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.joel.duoclinkayudantia.data.AppDatabase
-import com.joel.duoclinkayudantia.repository.AyudantiaRepository
-import com.joel.duoclinkayudantia.data.UserPrefs
 import com.joel.duoclinkayudantia.model.Ayudantia
 import com.joel.duoclinkayudantia.repository.AyudantiaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +26,11 @@ data class CrearAyudantiaUiState(
 
 class AyudantiaViewModel(
     application: Application,
-    private val repo: AyudantiaRepository = AyudantiaRepository()
+    private val repo: AyudantiaRepository
 ) : AndroidViewModel(application) {
+
+    @Suppress("unused")
+    constructor(application: Application) : this(application, AyudantiaRepository())
 
     private val _ayudantias = MutableStateFlow<List<Ayudantia>>(emptyList())
     val ayudantias: StateFlow<List<Ayudantia>> = _ayudantias.asStateFlow()
