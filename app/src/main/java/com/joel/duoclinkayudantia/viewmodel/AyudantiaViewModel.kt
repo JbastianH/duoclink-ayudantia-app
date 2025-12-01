@@ -24,9 +24,10 @@ data class CrearAyudantiaUiState(
     val error: String? = null
 )
 
-class AyudantiaViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repo = AyudantiaRepository()
+class AyudantiaViewModel(
+    application: Application,
+    private val repo: AyudantiaRepository = AyudantiaRepository()
+) : AndroidViewModel(application) {
 
     private val _ayudantias = MutableStateFlow<List<Ayudantia>>(emptyList())
     val ayudantias: StateFlow<List<Ayudantia>> = _ayudantias.asStateFlow()
