@@ -1,16 +1,20 @@
 package com.joel.duoclinkayudantia.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.google.firebase.Timestamp
 
-@Entity(tableName = "ayudantias")
 data class Ayudantia(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val publicadoPor: String,
-    val tema: String,
-    val lugar: String,
-    val hora: String,
-    val dia: String,
-    val cupos: Int,
-    val duracion: Int
+    val id: String = "",
+    val materia: String = "",
+    val cupo: Int = 0,
+    val inscritos: Int = 0,
+    val horario: String = "",
+    val dia: String = "",
+    val lugar: String = "",
+    val autor: Autor = Autor(),
+    val creado: Timestamp? = null
+)
+
+data class Autor(
+    val uid: String = "",
+    val nombre: String = ""
 )

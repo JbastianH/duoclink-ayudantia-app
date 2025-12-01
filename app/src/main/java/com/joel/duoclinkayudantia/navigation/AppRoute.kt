@@ -7,7 +7,7 @@ sealed class AppRoute(val path: String) {
     object Perfil : AppRoute("perfil")
     object CrearAyudantia : AppRoute("crear_ayudantia")
     object EditarAyudantia : AppRoute("editar_ayudantia/{ayudantiaId}") {
-        fun createRoute(ayudantiaId: Int) = "editar_ayudantia/$ayudantiaId"
+        fun createRoute(ayudantiaId: String) = "editar_ayudantia/$ayudantiaId"
     }
     object AyudantiasGraph : AppRoute("ayudantias_graph")
 }
