@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.firebase.auth)
 
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
