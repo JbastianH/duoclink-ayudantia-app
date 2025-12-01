@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.joel.duoclinkayudantia.model.Autor
+import com.joel.duoclinkayudantia.data.AyudantiaDao
 import com.joel.duoclinkayudantia.model.Ayudantia
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
