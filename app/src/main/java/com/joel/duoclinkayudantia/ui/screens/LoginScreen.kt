@@ -21,11 +21,13 @@ import com.joel.duoclinkayudantia.ui.theme.DuocBlue
 import com.joel.duoclinkayudantia.ui.theme.DuocWhite
 import com.joel.duoclinkayudantia.ui.theme.DuocYellow
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -64,7 +66,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Usuario", color = DuocBlue) },
+                label = { Text("Correo", color = DuocBlue) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -103,27 +105,31 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     when {
-                        username.isBlank() && password.isBlank() -> {
-                            scope.launch { snackbarHostState.showSnackbar("Debe ingresar usuario y contraseña") }
-                        }
                         username.isBlank() -> {
-                            scope.launch { snackbarHostState.showSnackbar("Debe ingresar el usuario") }
+                            scope.launch { snackbarHostState.showSnackbar("Debe ingresar el correo") }
                         }
                         password.isBlank() -> {
                             scope.launch { snackbarHostState.showSnackbar("Debe ingresar la contraseña") }
                         }
                         else -> {
-                            val ok = (username == "admin" && password == "1234")
-                            if (ok) {
-                                navController.navigate(AppRoute.Home.path) {
-                                    popUpTo(AppRoute.Login.path) { inclusive = true }
+                            isLoading = true
+                            FirebaseAuth.getInstance().signInWithEmailAndPassword(username, password)
+                                .addOnCompleteListener { task ->
+                                    isLoading = false
+                                    if (task.isSuccessful) {
+                                        navController.navigate(AppRoute.Home.path) {
+                                            popUpTo(AppRoute.Login.path) { inclusive = true }
+                                        }
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Error: ${task.exception?.localizedMessage}")
+                                        }
+                                    }
                                 }
-                            } else {
-                                scope.launch { snackbarHostState.showSnackbar("Usuario o contraseña incorrectos") }
-                            }
                         }
                     }
                 },
+                enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth(),
                 interactionSource = interactionSource,
                 colors = ButtonDefaults.buttonColors(
@@ -131,7 +137,14 @@ fun LoginScreen(navController: NavController) {
                     contentColor = animatedContent
                 )
             ) {
-                Text("Iniciar sesión")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = animatedContent
+                    )
+                } else {
+                    Text("Iniciar sesión")
+                }
             }
         }
     }

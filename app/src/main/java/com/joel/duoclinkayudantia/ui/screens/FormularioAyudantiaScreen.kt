@@ -1,16 +1,18 @@
 package com.joel.duoclinkayudantia.ui.screens
 
-import androidx.compose.foundation.clickable
+import android.app.TimePickerDialog
+import android.app.DatePickerDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,62 +22,57 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioAyudantiaScreen(
     navController: NavController,
-    vm: AyudantiaViewModel,
-    ayudantiaId: Int? = null
+    vm: AyudantiaViewModel
 ) {
     val formState by vm.formState.collectAsState()
-    val isEditing = ayudantiaId != null
     val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    // Date Picker Logic
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            val selectedDate = "$dayOfMonth/${month + 1}/$year"
+            vm.onDiaChange(selectedDate)
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
-    LaunchedEffect(Unit) {
-        if (isEditing) {
-            vm.cargarAyudantiaParaEditar(ayudantiaId!!)
-        } else {
-            vm.resetFormState()
-        }
+    // Time Picker Logic
+    fun showTimePicker(onTimeSelected: (String) -> Unit) {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val time = String.format("%02d:%02d", hourOfDay, minute)
+                onTimeSelected(time)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
+        ).show()
     }
+
     LaunchedEffect(formState.success) {
         if (formState.success) {
-            delay(1000)
-            vm.dismissSuccess()
+            delay(1500)
+            vm.resetSuccess()
             navController.popBackStack()
-        }
-    }
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDatePicker = false
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                        val date = formatter.format(Date(millis))
-                        vm.onFormValueChange(dia = date)
-                    }
-                }) { Text("Aceptar") }
-            },
-            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") } }
-        ) {
-            DatePicker(state = datePickerState)
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (isEditing) "Editar Ayudantía" else "Crear Ayudantía") },
+                title = { Text("Publicar Ayudantía") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
@@ -84,189 +81,116 @@ fun FormularioAyudantiaScreen(
             )
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Materia
                 OutlinedTextField(
-                    value = formState.publicadoPor,
-                    onValueChange = { },
-                    label = { Text("Publicado Por") },
+                    value = formState.materia,
+                    onValueChange = { vm.onMateriaChange(it) },
+                    label = { Text("Materia") },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                // Cupo
+                OutlinedTextField(
+                    value = formState.cupo,
+                    onValueChange = { vm.onCupoChange(it) },
+                    label = { Text("Cupo (máx 40)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                // Horarios
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = formState.horarioInicio,
+                        onValueChange = {},
+                        label = { Text("Inicio") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showTimePicker { vm.onHorarioInicioChange(it) } }) {
+                                Icon(Icons.Default.AccessTime, "Seleccionar hora inicio")
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = formState.horarioFin,
+                        onValueChange = {},
+                        label = { Text("Fin") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showTimePicker { vm.onHorarioFinChange(it) } }) {
+                                Icon(Icons.Default.AccessTime, "Seleccionar hora fin")
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Día
+                OutlinedTextField(
+                    value = formState.dia,
+                    onValueChange = {},
+                    label = { Text("Día") },
                     readOnly = true,
-                    enabled = false
+                    trailingIcon = {
+                        IconButton(onClick = { datePickerDialog.show() }) {
+                            Icon(Icons.Default.DateRange, "Seleccionar día")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                OutlinedTextField(
-                    value = formState.tema,
-                    onValueChange = { vm.onFormValueChange(tema = it) },
-                    label = { Text("Tema") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = formState.temaError != null,
-                    supportingText = { formState.temaError?.let { Text(it) } }
-                )
-
+                // Lugar
                 OutlinedTextField(
                     value = formState.lugar,
-                    onValueChange = { vm.onFormValueChange(lugar = it) },
+                    onValueChange = { vm.onLugarChange(it) },
                     label = { Text("Lugar") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = formState.lugarError != null,
-                    supportingText = { formState.lugarError?.let { Text(it) } }
+                    singleLine = true
                 )
 
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = formState.dia,
-                        onValueChange = { },
-                        label = { Text("Día") },
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { showDatePicker = true },
-                        isError = formState.diaError != null,
-                        supportingText = { formState.diaError?.let { Text(it) } },
-                        readOnly = true,
-                        enabled = false,
-                        trailingIcon = {
-                            Icon(
-                                Icons.Default.DateRange,
-                                contentDescription = "Seleccionar fecha",
-                                modifier = Modifier.clickable { showDatePicker = true }
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                            disabledBorderColor = MaterialTheme.colorScheme.outline,
-                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = formState.horaInput,
-                            onValueChange = { if (it.length <= 2) vm.onFormValueChange(horaInput = it) },
-                            label = { Text("HH") },
-                            modifier = Modifier.weight(1f),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = formState.horaError != null
-                        )
-                        Text(":", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(top = 8.dp))
-                        OutlinedTextField(
-                            value = formState.minutoInput,
-                            onValueChange = { if (it.length <= 2) vm.onFormValueChange(minutoInput = it) },
-                            label = { Text("MM") },
-                            modifier = Modifier.weight(1f),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = formState.horaError != null
-                        )
-                    }
+                if (formState.error != null) {
+                    Text(formState.error!!, color = MaterialTheme.colorScheme.error)
                 }
-
-                if (formState.horaError != null) {
-                    Text(
-                        text = formState.horaError!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp)
-                    )
-                }
-
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = formState.cupos,
-                        onValueChange = { vm.onFormValueChange(cupos = it) },
-                        label = { Text("Cupos") },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = formState.cuposError != null,
-                        supportingText = { formState.cuposError?.let { Text(it) } }
-                    )
-                    OutlinedTextField(
-                        value = formState.duracion,
-                        onValueChange = { vm.onFormValueChange(duracion = it) },
-                        label = { Text("Duración") },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = formState.duracionError != null,
-                        supportingText = { formState.duracionError?.let { Text(it) } },
-                        suffix = { Text("min") }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { vm.guardarAyudantia() },
+                    onClick = { vm.publicarAyudantia() },
                     enabled = !formState.isLoading && !formState.success,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("Guardar Ayudantía")
+                    Text("Publicar Ayudantía")
                 }
             }
 
-            // Overlay de carga
+            // Loading Overlay
             if (formState.isLoading) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        tonalElevation = 6.dp
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            CircularProgressIndicator()
-                            Text("Publicando ayudantía...")
-                        }
-                    }
+                    CircularProgressIndicator()
                 }
             }
-            if (!formState.isLoading && formState.success) {
+
+            // Success Overlay
+            if (formState.success) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        tonalElevation = 6.dp
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.CheckCircle,
-                                contentDescription = "Éxito",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Text("¡Ayudantía publicada!")
+                    Surface(shape = RoundedCornerShape(16.dp), tonalElevation = 6.dp) {
+                        Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(48.dp))
+                            Text("¡Publicada!", modifier = Modifier.padding(top = 16.dp))
                         }
                     }
                 }

@@ -92,17 +92,19 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
             FormularioAyudantiaScreen(navController, viewModel)
         }
+        /*
         composable(
             route = AppRoute.EditarAyudantia.path,
-            arguments = listOf(navArgument("ayudantiaId") { type = NavType.IntType })
+            arguments = listOf(navArgument("ayudantiaId") { type = NavType.StringType })
         ) { navBackStackEntry ->
             val backStackEntry = remember(navBackStackEntry) {
                 navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
             }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
-            val ayudantiaId = navBackStackEntry.arguments?.getInt("ayudantiaId")
-            FormularioAyudantiaScreen(navController, viewModel, ayudantiaId)
+            val ayudantiaId = navBackStackEntry.arguments?.getString("ayudantiaId")
+            // FormularioAyudantiaScreen(navController, viewModel, ayudantiaId) // TODO: Habilitar edición
         }
+        */
     }
 }
 
