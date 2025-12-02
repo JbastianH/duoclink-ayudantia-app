@@ -93,6 +93,7 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
             viewModel.limpiarFormulario()
             FormularioAyudantiaScreen(navController, viewModel)
         }
+        /*
         composable(
             route = AppRoute.EditarAyudantia.path,
             arguments = listOf(navArgument("ayudantiaId") { type = NavType.StringType })
@@ -103,6 +104,7 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
             FormularioAyudantiaScreen(navController, viewModel)
         }
+        */
     }
 }
 
