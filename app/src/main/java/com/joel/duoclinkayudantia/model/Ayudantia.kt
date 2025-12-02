@@ -1,6 +1,6 @@
 package com.joel.duoclinkayudantia.model
 
-import com.google.firebase.Timestamp
+import com.google.gson.annotations.SerializedName
 
 data class Ayudantia(
     val id: String = "",
@@ -11,7 +11,8 @@ data class Ayudantia(
     val dia: String = "",
     val lugar: String = "",
     val autor: Autor = Autor(),
-    val creado: Timestamp? = null
+    @SerializedName("createdAt")
+    val creado: String? = null
 )
 
 data class Autor(

@@ -72,7 +72,7 @@ fun FormularioAyudantiaScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Publicar Ayudantía") },
+                title = { Text(if (formState.isEditing) "Editar Ayudantía" else "Publicar Ayudantía") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
@@ -167,7 +167,7 @@ fun FormularioAyudantiaScreen(
                     enabled = !formState.isLoading && !formState.success,
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("Publicar Ayudantía")
+                    Text(if (formState.isEditing) "Guardar Cambios" else "Publicar Ayudantía")
                 }
             }
 
@@ -190,7 +190,7 @@ fun FormularioAyudantiaScreen(
                     Surface(shape = RoundedCornerShape(16.dp), tonalElevation = 6.dp) {
                         Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(48.dp))
-                            Text("¡Publicada!", modifier = Modifier.padding(top = 16.dp))
+                            Text(if (formState.isEditing) "¡Actualizada!" else "¡Publicada!", modifier = Modifier.padding(top = 16.dp))
                         }
                     }
                 }
