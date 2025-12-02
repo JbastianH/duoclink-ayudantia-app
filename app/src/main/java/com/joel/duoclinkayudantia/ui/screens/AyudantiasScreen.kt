@@ -3,6 +3,10 @@ package com.joel.duoclinkayudantia.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.joel.duoclinkayudantia.navigation.AppRoute
 import com.joel.duoclinkayudantia.model.Ayudantia
+import com.joel.duoclinkayudantia.navigation.AppRoute
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,6 +25,8 @@ fun AyudantiasScreen(
     vm: AyudantiaViewModel
 ) {
     val ayudantias by vm.ayudantias.collectAsState()
+    val isLoading by vm.isLoadingList.collectAsState()
+    val currentUserUid = vm.currentUserUid
 
     Scaffold { padding ->
         Column(
@@ -48,7 +54,18 @@ fun AyudantiasScreen(
                 }
             }
 
-            if (ayudantias.isEmpty()) {
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Cargando ayudantías...")
+                    }
+                }
+            } else if (ayudantias.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -62,7 +79,13 @@ fun AyudantiasScreen(
                     items(ayudantias) { ayudantia ->
                         AyudantiaCard(
                             ayudantia = ayudantia,
-                            onUnirseClick = { vm.unirse(ayudantia) }
+                            isOwner = ayudantia.autor.uid == currentUserUid,
+                            onUnirseClick = { vm.unirse(ayudantia) },
+                            onEditClick = {
+                                vm.prepararEdicion(ayudantia)
+                                navController.navigate(AppRoute.EditarAyudantia.createRoute(ayudantia.id))
+                            },
+                            onDeleteClick = { vm.eliminarAyudantia(ayudantia.id) }
                         )
                     }
                 }
@@ -74,25 +97,73 @@ fun AyudantiasScreen(
 @Composable
 fun AyudantiaCard(
     ayudantia: Ayudantia,
-    onUnirseClick: () -> Unit
+    isOwner: Boolean,
+    onUnirseClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val isFull = ayudantia.inscritos >= ayudantia.cupo
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar Ayudantía") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta ayudantía? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteClick()
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
     
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = ayudantia.materia,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Por: ${ayudantia.autor.nombre}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = ayudantia.materia,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Por: ${ayudantia.autor.nombre}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                if (isOwner) {
+                    Row {
+                        IconButton(onClick = onEditClick) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.primary)
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -116,11 +187,13 @@ fun AyudantiaCard(
                     )
                 )
                 
-                Button(
-                    onClick = onUnirseClick,
-                    enabled = !isFull
-                ) {
-                    Text(if (isFull) "Sin Cupos" else "Unirme")
+                if (!isOwner) {
+                    Button(
+                        onClick = onUnirseClick,
+                        enabled = !isFull
+                    ) {
+                        Text(if (isFull) "Sin Cupos" else "Unirme")
+                    }
                 }
             }
         }
