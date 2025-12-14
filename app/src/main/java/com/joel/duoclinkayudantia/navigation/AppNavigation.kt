@@ -94,6 +94,7 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
                 navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
             }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
+            viewModel.limpiarFormulario()
             FormularioAyudantiaScreen(navController, viewModel)
         }
         /*
@@ -105,8 +106,7 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
                 navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
             }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
-            val ayudantiaId = navBackStackEntry.arguments?.getString("ayudantiaId")
-            // FormularioAyudantiaScreen(navController, viewModel, ayudantiaId) // TODO: Habilitar edición
+            FormularioAyudantiaScreen(navController, viewModel)
         }
         */
     }
