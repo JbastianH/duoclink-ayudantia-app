@@ -3,6 +3,8 @@ package com.joel.duoclinkayudantia.navigation
 sealed class AppRoute(val path: String) {
     object Login : AppRoute("login")
     object Home : AppRoute("home")
+    object Apuntes : AppRoute("apuntes")
+
     object Ayudantias : AppRoute("ayudantias")
     object Perfil : AppRoute("perfil")
     object CrearAyudantia : AppRoute("crear_ayudantia")
