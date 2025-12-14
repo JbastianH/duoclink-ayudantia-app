@@ -171,7 +171,6 @@ fun FormularioAyudantiaScreen(
                 }
             }
 
-            // Loading Overlay
             if (formState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
@@ -181,7 +180,6 @@ fun FormularioAyudantiaScreen(
                 }
             }
 
-            // Success Overlay
             if (formState.success) {
                 Box(
                     modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)),
