@@ -22,7 +22,6 @@ class AyudantiaRepository {
     }
 
     suspend fun crearAyudantia(ayudantia: Ayudantia): String {
-        // El API se encarga de asignar el autor basado en el token
         val response = api.crearAyudantia(ayudantia)
         return response.id
     }
@@ -36,8 +35,6 @@ class AyudantiaRepository {
     }
 
     suspend fun unirse(ayudantiaId: String) {
-        // TODO: El API actual no soporta la funcionalidad de 'unirse' para usuarios que no son el autor.
-        // Se requiere un endpoint POST /api/ayudantias/{id}/join o similar.
         android.util.Log.w("AyudantiaRepository", "Funcionalidad 'unirse' no implementada en API REST")
         throw Exception("Funcionalidad no disponible en API")
     }

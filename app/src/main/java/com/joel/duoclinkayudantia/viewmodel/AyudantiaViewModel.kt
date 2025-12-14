@@ -106,7 +106,6 @@ class AyudantiaViewModel(
     fun publicarAyudantia() {
         val s = _formState.value
         
-        // Validaciones
         if (s.materia.isBlank()) {
             _formState.update { it.copy(error = "Debes ingresar la materia") }
             return
@@ -127,7 +126,6 @@ class AyudantiaViewModel(
             return
         }
 
-        // Validar fecha no anterior a hoy
         try {
             val sdf = java.text.SimpleDateFormat("d/M/yyyy", java.util.Locale.getDefault())
             val date = sdf.parse(s.dia)
@@ -143,7 +141,6 @@ class AyudantiaViewModel(
                 return
             }
         } catch (e: Exception) {
-            // Ignorar error de parseo si el formato es incorrecto, aunque viene del DatePicker
         }
 
         if (s.horarioInicio.isBlank() || s.horarioFin.isBlank()) {
@@ -201,7 +198,6 @@ class AyudantiaViewModel(
             try {
                 repo.unirse(ayudantia.id)
             } catch (e: Exception) {
-                // Manejar error visualmente si es necesario
             }
         }
     }

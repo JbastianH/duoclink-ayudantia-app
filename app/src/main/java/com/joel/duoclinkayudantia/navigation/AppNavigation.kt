@@ -20,6 +20,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.joel.duoclinkayudantia.ui.theme.DuocBlue
+import com.joel.duoclinkayudantia.ui.theme.DuocWhite
+import com.joel.duoclinkayudantia.ui.theme.DuocYellow
 import com.joel.duoclinkayudantia.ui.screens.AyudantiasScreen
 import com.joel.duoclinkayudantia.ui.screens.FormularioAyudantiaScreen
 import com.joel.duoclinkayudantia.ui.screens.HomeScreen
@@ -28,7 +31,12 @@ import com.joel.duoclinkayudantia.ui.screens.PerfilScreen
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import com.joel.duoclinkayudantia.ui.screens.ApuntesScreen
+import com.joel.duoclinkayudantia.ui.screens.FormularioApunteScreen
+import com.joel.duoclinkayudantia.viewmodel.ApuntesViewModel
+
+import com.joel.duoclinkayudantia.ui.screens.DetalleApunteScreen
 
 @Composable
 fun AppNavigation() {
@@ -42,7 +50,10 @@ fun AppNavigation() {
             val showBottomBar = currentDestination?.route != AppRoute.Login.path
 
             if (showBottomBar) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = DuocBlue,
+                    contentColor = DuocWhite
+                ) {
                     bottomItems.forEach { item ->
                         NavigationBarItem(
                             selected = currentDestination.isOn(item.route),
@@ -56,7 +67,14 @@ fun AppNavigation() {
                                 }
                             },
                             icon = { Icon(item.icon, contentDescription = item.cd) },
-                            label = { Text(item.label) }
+                            label = { Text(item.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = DuocBlue,
+                                selectedTextColor = DuocYellow,
+                                indicatorColor = DuocYellow,
+                                unselectedIconColor = DuocWhite,
+                                unselectedTextColor = DuocWhite
+                            )
                         )
                     }
                 }
@@ -70,7 +88,8 @@ fun AppNavigation() {
         ) {
             composable(AppRoute.Login.path) { LoginScreen(navController) }
             composable(AppRoute.Home.path) { HomeScreen(navController) }
-            composable(AppRoute.Apuntes.path) { ApuntesScreen(navController) }
+            
+            apuntesGraph(navController)
 
             ayudantiasGraph(navController)
             composable(AppRoute.Perfil.path) { PerfilScreen(navController) }
@@ -121,6 +140,74 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
     }
 }
 
+fun NavGraphBuilder.apuntesGraph(navController: NavHostController) {
+    navigation(
+        startDestination = AppRoute.Apuntes.path,
+        route = AppRoute.ApuntesGraph.path
+    ) {
+        composable(AppRoute.Apuntes.path) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.ApuntesGraph.path)
+            }
+            val viewModel: ApuntesViewModel = viewModel(backStackEntry)
+            ApuntesScreen(navController, viewModel)
+        }
+        composable(AppRoute.CrearApunte.path) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.ApuntesGraph.path)
+            }
+            val viewModel: ApuntesViewModel = viewModel(backStackEntry)
+            viewModel.limpiarFormulario()
+            FormularioApunteScreen(navController, viewModel)
+        }
+        
+        composable(
+            route = AppRoute.DetalleApunte.path,
+            arguments = listOf(navArgument("apunteId") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.ApuntesGraph.path)
+            }
+            val viewModel: ApuntesViewModel = viewModel(backStackEntry)
+            val apunteId = navBackStackEntry.arguments?.getString("apunteId")
+
+            LaunchedEffect(apunteId) {
+                if (apunteId != null) {
+                    viewModel.cargarApunte(apunteId)
+                }
+            }
+            
+            DisposableEffect(Unit) {
+                onDispose {
+                    viewModel.limpiarApunteSeleccionado()
+                }
+            }
+
+            DetalleApunteScreen(navController, viewModel)
+        }
+
+        composable(
+            route = AppRoute.EditarApunte.path,
+            arguments = listOf(navArgument("apunteId") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val backStackEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(AppRoute.ApuntesGraph.path)
+            }
+            val viewModel: ApuntesViewModel = viewModel(backStackEntry)
+            val apunteId = navBackStackEntry.arguments?.getString("apunteId")
+            
+            LaunchedEffect(apunteId) {
+                val apunte = viewModel.apuntes.value.find { it.id == apunteId }
+                if (apunte != null) {
+                    viewModel.prepararEdicion(apunte)
+                }
+            }
+            
+            FormularioApunteScreen(navController, viewModel)
+        }
+    }
+}
+
 private data class BottomItem(
     val route: String,
     val label: String,
@@ -130,7 +217,7 @@ private data class BottomItem(
 
 private val bottomItems = listOf(
     BottomItem(AppRoute.Home.path, "Inicio", "Ir a inicio", Icons.Filled.Home),
-    BottomItem(AppRoute.Apuntes.path, "Apuntes", "Ir a apuntes", Icons.Filled.Description),
+    BottomItem(AppRoute.ApuntesGraph.path, "Apuntes", "Ir a apuntes", Icons.Filled.Description),
     BottomItem(AppRoute.AyudantiasGraph.path, "Ayudantías", "Ir a ayudantías", Icons.Filled.School),
     BottomItem(AppRoute.Perfil.path, "Perfil", "Ir a perfil", Icons.Filled.Person),
 )
