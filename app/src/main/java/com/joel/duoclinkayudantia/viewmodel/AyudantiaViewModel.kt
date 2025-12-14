@@ -105,15 +105,60 @@ class AyudantiaViewModel(
 
     fun publicarAyudantia() {
         val s = _formState.value
-        if (s.materia.isBlank() || s.dia.isBlank() || s.lugar.isBlank()) {
-            _formState.update { it.copy(error = "Completa todos los campos obligatorios") }
+        
+        // Validaciones
+        if (s.materia.isBlank()) {
+            _formState.update { it.copy(error = "Debes ingresar la materia") }
+            return
+        }
+        
+        val cupoInt = s.cupo.toIntOrNull()
+        if (cupoInt == null || cupoInt < 1) {
+            _formState.update { it.copy(error = "El cupo debe ser al menos 1") }
+            return
+        }
+        if (cupoInt > 40) {
+            _formState.update { it.copy(error = "El cupo máximo permitido es 40") }
+            return
+        }
+
+        if (s.dia.isBlank()) {
+            _formState.update { it.copy(error = "Debes seleccionar una fecha") }
+            return
+        }
+
+        // Validar fecha no anterior a hoy
+        try {
+            val sdf = java.text.SimpleDateFormat("d/M/yyyy", java.util.Locale.getDefault())
+            val date = sdf.parse(s.dia)
+            val today = java.util.Calendar.getInstance().apply {
+                set(java.util.Calendar.HOUR_OF_DAY, 0)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }.time
+            
+            if (date != null && date.before(today)) {
+                _formState.update { it.copy(error = "La fecha no puede ser anterior a hoy") }
+                return
+            }
+        } catch (e: Exception) {
+            // Ignorar error de parseo si el formato es incorrecto, aunque viene del DatePicker
+        }
+
+        if (s.horarioInicio.isBlank() || s.horarioFin.isBlank()) {
+            _formState.update { it.copy(error = "Debes definir el horario de inicio y fin") }
+            return
+        }
+
+        if (s.lugar.isBlank()) {
+            _formState.update { it.copy(error = "Debes ingresar el lugar o sala") }
             return
         }
 
         viewModelScope.launch {
             _formState.update { it.copy(isLoading = true, error = null) }
             try {
-                val cupoInt = s.cupo.toIntOrNull() ?: 1
                 val horario = "${s.horarioInicio} a ${s.horarioFin}"
                 
                 val ayudantia = Ayudantia(

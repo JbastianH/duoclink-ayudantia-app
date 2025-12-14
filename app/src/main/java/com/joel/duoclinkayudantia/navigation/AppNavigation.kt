@@ -27,6 +27,7 @@ import com.joel.duoclinkayudantia.ui.screens.LoginScreen
 import com.joel.duoclinkayudantia.ui.screens.PerfilScreen
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import com.joel.duoclinkayudantia.ui.screens.ApuntesScreen
 
 @Composable
@@ -97,7 +98,7 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
             viewModel.limpiarFormulario()
             FormularioAyudantiaScreen(navController, viewModel)
         }
-        /*
+        
         composable(
             route = AppRoute.EditarAyudantia.path,
             arguments = listOf(navArgument("ayudantiaId") { type = NavType.StringType })
@@ -106,9 +107,17 @@ fun NavGraphBuilder.ayudantiasGraph(navController: NavHostController) {
                 navController.getBackStackEntry(AppRoute.AyudantiasGraph.path)
             }
             val viewModel: AyudantiaViewModel = viewModel(backStackEntry)
+            val ayudantiaId = navBackStackEntry.arguments?.getString("ayudantiaId")
+            
+            LaunchedEffect(ayudantiaId) {
+                val ayudantia = viewModel.ayudantias.value.find { it.id == ayudantiaId }
+                if (ayudantia != null) {
+                    viewModel.prepararEdicion(ayudantia)
+                }
+            }
+            
             FormularioAyudantiaScreen(navController, viewModel)
         }
-        */
     }
 }
 
