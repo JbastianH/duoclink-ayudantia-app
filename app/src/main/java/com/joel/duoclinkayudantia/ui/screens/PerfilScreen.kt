@@ -2,6 +2,7 @@ package com.joel.duoclinkayudantia.ui.screens
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -49,8 +51,23 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var showSaveSuccess by remember { mutableStateOf(false) }
+
+    fun createImageUri(context: android.content.Context): Uri? {
+        val values = ContentValues().apply {
+            put(
+                MediaStore.Images.Media.DISPLAY_NAME,
+                "perfil_${System.currentTimeMillis()}.jpg"
+            )
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/DuocLinkAyudantia")
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            values
+        )
+    }
 
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
         if (success && cameraUri != null) {
@@ -71,42 +88,26 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
         }
     }
 
-    val permissionsToRequest = remember {
-        buildList {
-            add(Manifest.permission.CAMERA)
-            if (Build.VERSION.SDK_INT >= 33)
-                add(Manifest.permission.READ_MEDIA_IMAGES)
-            else
-                add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }.toTypedArray()
-    }
-    val requestPermissions = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { }
-
-    fun createImageUri(context: android.content.Context): Uri? {
-        val values = ContentValues().apply {
-            put(
-                MediaStore.Images.Media.DISPLAY_NAME,
-                "perfil_${System.currentTimeMillis()}.jpg"
-            )
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/DuocLinkAyudantia")
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraUri = createImageUri(context)
+            cameraUri?.let { takePicture.launch(it) }
         }
-        return context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            values
-        )
     }
 
     fun onTakePhoto() {
-        requestPermissions.launch(permissionsToRequest)
-        cameraUri = createImageUri(context)
-        cameraUri?.let { takePicture.launch(it) }
+        val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+            cameraUri = createImageUri(context)
+            cameraUri?.let { takePicture.launch(it) }
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     fun onPickFromGallery() {
-        requestPermissions.launch(permissionsToRequest)
         pickFromGallery.launch("image/*")
     }
 
@@ -120,8 +121,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
                     titleContentColor = DuocWhite
                 )
             )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        }
     ) { inner ->
         Column(
             modifier = Modifier
@@ -220,11 +220,24 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel = viewModel()
             Button(
                 onClick = {
                     vm.saveProfile()
-                    scope.launch { snackbarHostState.showSnackbar("Perfil guardado") }
+                    showSaveSuccess = true
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = buttonColors(containerColor = DuocYellow)
             ) { Text("Guardar cambios") }
+
+            if (showSaveSuccess) {
+                AlertDialog(
+                    onDismissRequest = { showSaveSuccess = false },
+                    title = { Text("Éxito") },
+                    text = { Text("Cambios guardados correctamente.") },
+                    confirmButton = {
+                        TextButton(onClick = { showSaveSuccess = false }) {
+                            Text("OK")
+                        }
+                    }
+                )
+            }
 
             var showConfirm by remember { mutableStateOf(false)}
 
