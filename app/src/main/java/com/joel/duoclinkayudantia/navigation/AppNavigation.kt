@@ -2,6 +2,7 @@ package com.joel.duoclinkayudantia.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
@@ -68,8 +69,6 @@ fun AppNavigation() {
         ) {
             composable(AppRoute.Login.path) { LoginScreen(navController) }
             composable(AppRoute.Home.path) { HomeScreen(navController) }
-
-            // 👉 AQUÍ VA APUNTES
             composable(AppRoute.Apuntes.path) { ApuntesScreen(navController) }
 
             ayudantiasGraph(navController)
@@ -122,9 +121,9 @@ private data class BottomItem(
 
 private val bottomItems = listOf(
     BottomItem(AppRoute.Home.path, "Inicio", "Ir a inicio", Icons.Filled.Home),
+    BottomItem(AppRoute.Apuntes.path, "Apuntes", "Ir a apuntes", Icons.Filled.Description),
     BottomItem(AppRoute.AyudantiasGraph.path, "Ayudantías", "Ir a ayudantías", Icons.Filled.School),
     BottomItem(AppRoute.Perfil.path, "Perfil", "Ir a perfil", Icons.Filled.Person),
 )
-
 private fun NavDestination?.isOn(route: String) =
     this?.hierarchy?.any { it.route == route } == true

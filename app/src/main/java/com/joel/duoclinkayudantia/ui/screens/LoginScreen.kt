@@ -63,7 +63,7 @@ fun LoginScreen(navController: NavController) {
                 contentScale = ContentScale.Fit
 
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = "Mobile",
                 style = MaterialTheme.typography.headlineMedium,
@@ -73,7 +73,7 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(50.dp))
 
 
             Spacer(Modifier.height(12.dp))
