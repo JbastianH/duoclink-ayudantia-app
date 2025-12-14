@@ -1,5 +1,6 @@
 package com.joel.duoclinkayudantia.ui.screens
 
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -49,7 +51,7 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxSize()
                 .background(DuocWhite)
                 .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -59,8 +61,22 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth(1f)
                     .height(250.dp),
                 contentScale = ContentScale.Fit
+
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Mobile",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = DuocBlue,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(Modifier.height(24.dp))
+
+
+            Spacer(Modifier.height(12.dp))
             Spacer(Modifier.height(2.dp))
 
             OutlinedTextField(

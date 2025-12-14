@@ -1,5 +1,5 @@
 package com.joel.duoclinkayudantia.ui.screens
-
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -48,24 +48,26 @@ fun HomeScreen(nav: NavController) {
                     contentScale = ContentScale.Fit
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
 
               
                 Text(
-                    text = "Ayudantías",
+                    text = "Mobile",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(4.dp))
 
             
                 Text(
-                    text = "Encuentra y gestiona tus ayudantías en un solo lugar.",
+                    text = "Todo lo que necesitas para tu vida estudiantil, desde un solo lugar.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                        .fillMaxWidth()
                 )
 
                 Spacer(Modifier.height(32.dp))
