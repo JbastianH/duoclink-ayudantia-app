@@ -35,7 +35,6 @@ fun FormularioAyudantiaScreen(
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    // Date Picker Logic
     val datePickerDialog = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -47,7 +46,6 @@ fun FormularioAyudantiaScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-    // Time Picker Logic
     fun showTimePicker(onTimeSelected: (String) -> Unit) {
         TimePickerDialog(
             context,
@@ -88,7 +86,6 @@ fun FormularioAyudantiaScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Materia
                 OutlinedTextField(
                     value = formState.materia,
                     onValueChange = { vm.onMateriaChange(it) },
@@ -97,7 +94,6 @@ fun FormularioAyudantiaScreen(
                     singleLine = true
                 )
 
-                // Cupo
                 OutlinedTextField(
                     value = formState.cupo,
                     onValueChange = { vm.onCupoChange(it) },
@@ -107,7 +103,6 @@ fun FormularioAyudantiaScreen(
                     singleLine = true
                 )
 
-                // Horarios
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = formState.horarioInicio,
@@ -135,7 +130,6 @@ fun FormularioAyudantiaScreen(
                     )
                 }
 
-                // Día
                 OutlinedTextField(
                     value = formState.dia,
                     onValueChange = {},
@@ -149,7 +143,6 @@ fun FormularioAyudantiaScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Lugar
                 OutlinedTextField(
                     value = formState.lugar,
                     onValueChange = { vm.onLugarChange(it) },

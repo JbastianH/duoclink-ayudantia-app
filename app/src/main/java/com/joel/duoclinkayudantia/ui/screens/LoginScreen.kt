@@ -34,8 +34,8 @@ fun LoginScreen(navController: NavController) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val targetContainer = if (isPressed) DuocYellow else DuocBlue
-    val targetContent = if (isPressed) DuocBlue else DuocWhite
+    val targetContainer = if (isPressed) DuocWhite else DuocYellow
+    val targetContent = DuocBlue
     val animatedContainer by animateColorAsState(targetContainer)
     val animatedContent by animateColorAsState(targetContent)
 

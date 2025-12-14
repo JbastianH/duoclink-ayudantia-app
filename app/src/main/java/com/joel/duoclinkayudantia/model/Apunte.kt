@@ -1,13 +1,19 @@
 package com.joel.duoclinkayudantia.model
 
-data class Apunte(
+import com.google.gson.annotations.SerializedName
 
-    val id: Long = 0,
+data class Apunte(
+    val id: String = "",
+    val type: String = "text",
+    @SerializedName("title")
     val titulo: String = "",
-    val descripcion: String = "",
-    val url: String = "",
-    val autor: String = "",
-    val fecha: String = ""
+    @SerializedName("body")
+    val descripcion: String? = null,
+    val link: String? = null,
+    val tags: List<String>? = emptyList(),
+    @SerializedName("createdAt")
+    val fecha: String? = null,
+    val userId: String? = null
 )
 
 

@@ -11,7 +11,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://2dnrxkw7-8082.brs.devtunnels.ms/"
+    private const val AYUDANTIAS_BASE_URL = "https://2dnrxkw7-8082.brs.devtunnels.ms/"
+    private const val APUNTES_BASE_URL = "https://2dnrxkw7-8081.brs.devtunnels.ms/"
 
     private val authInterceptor = Interceptor { chain ->
         val user = FirebaseAuth.getInstance().currentUser
@@ -19,7 +20,6 @@ object RetrofitClient {
 
         if (user != null) {
             try {
-                // Obtener el token de forma síncrona (bloqueante) porque estamos en un hilo de fondo de OkHttp
                 val tokenResult = Tasks.await(user.getIdToken(true))
                 val token = tokenResult.token
                 if (token != null) {
@@ -47,10 +47,19 @@ object RetrofitClient {
 
     val api: AyudantiaApi by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(AYUDANTIAS_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AyudantiaApi::class.java)
+    }
+
+    val apunteApi: ApunteApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(APUNTES_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApunteApi::class.java)
     }
 }
