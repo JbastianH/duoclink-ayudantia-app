@@ -26,6 +26,7 @@ import com.joel.duoclinkayudantia.ui.screens.LoginScreen
 import com.joel.duoclinkayudantia.ui.screens.PerfilScreen
 import com.joel.duoclinkayudantia.viewmodel.AyudantiaViewModel
 import androidx.compose.runtime.remember
+import com.joel.duoclinkayudantia.ui.screens.ApuntesScreen
 
 @Composable
 fun AppNavigation() {
@@ -67,6 +68,10 @@ fun AppNavigation() {
         ) {
             composable(AppRoute.Login.path) { LoginScreen(navController) }
             composable(AppRoute.Home.path) { HomeScreen(navController) }
+
+            // 👉 AQUÍ VA APUNTES
+            composable(AppRoute.Apuntes.path) { ApuntesScreen(navController) }
+
             ayudantiasGraph(navController)
             composable(AppRoute.Perfil.path) { PerfilScreen(navController) }
         }
