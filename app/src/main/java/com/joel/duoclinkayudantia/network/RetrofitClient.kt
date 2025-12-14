@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://duoclink.vercel.app/"
+    private const val BASE_URL = "https://2dnrxkw7-8082.brs.devtunnels.ms/"
 
     private val authInterceptor = Interceptor { chain ->
         val user = FirebaseAuth.getInstance().currentUser

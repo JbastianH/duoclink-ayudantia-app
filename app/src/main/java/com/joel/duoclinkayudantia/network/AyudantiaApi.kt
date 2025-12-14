@@ -16,7 +16,7 @@ interface AyudantiaApi {
     suspend fun crearAyudantia(@Body ayudantia: Ayudantia): Ayudantia
 
     @PUT("api/ayudantias/{id}")
-    suspend fun actualizarAyudantia(@Path("id") id: String, @Body ayudantia: Ayudantia): Ayudantia
+    suspend fun actualizarAyudantia(@Path("id") id: String, @Body ayudantia: Ayudantia): Map<String, String>
 
     @DELETE("api/ayudantias/{id}")
     suspend fun eliminarAyudantia(@Path("id") id: String)
