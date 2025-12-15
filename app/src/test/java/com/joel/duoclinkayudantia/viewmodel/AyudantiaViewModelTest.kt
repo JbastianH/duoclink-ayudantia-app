@@ -50,7 +50,7 @@ class AyudantiaViewModelTest {
         viewModel.publicarAyudantia()
 
         val state = viewModel.formState.value
-        state.error shouldBe "Completa todos los campos obligatorios"
+        state.error shouldBe "Debes ingresar la materia"
         
         coVerify(exactly = 0) { repo.crearAyudantia(any()) }
     }
@@ -58,12 +58,16 @@ class AyudantiaViewModelTest {
     @Test
     fun publicarAyudantia_emptyPlace_returnsError() = runTest {
         viewModel.onMateriaChange("Matemáticas")
-        viewModel.onLugarChange("") 
+        viewModel.onCupoChange("5")
+        viewModel.onLugarChange("")
+        viewModel.onDiaChange("Lunes")
+        viewModel.onHorarioInicioChange("10:00")
+        viewModel.onHorarioFinChange("12:00")
 
         viewModel.publicarAyudantia()
 
         val state = viewModel.formState.value
-        state.error shouldBe "Completa todos los campos obligatorios"
+        state.error shouldBe "Debes ingresar el lugar o sala"
         coVerify(exactly = 0) { repo.crearAyudantia(any()) }
     }
 
@@ -76,7 +80,7 @@ class AyudantiaViewModelTest {
         viewModel.publicarAyudantia()
 
         val state = viewModel.formState.value
-        state.error shouldBe "Completa todos los campos obligatorios"
+        state.error shouldBe "Debes seleccionar una fecha"
         coVerify(exactly = 0) { repo.crearAyudantia(any()) }
     }
 
@@ -85,6 +89,9 @@ class AyudantiaViewModelTest {
         viewModel.onMateriaChange("Matemáticas")
         viewModel.onLugarChange("Sala 1")
         viewModel.onDiaChange("Lunes")
+        viewModel.onCupoChange("5")
+        viewModel.onHorarioInicioChange("10:00")
+        viewModel.onHorarioFinChange("12:00")
         
         val errorMsg = "Error de conexión"
         coEvery { repo.crearAyudantia(any()) } throws Exception(errorMsg)
